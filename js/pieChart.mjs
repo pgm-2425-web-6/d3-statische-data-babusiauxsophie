@@ -1,16 +1,19 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export default function pieChart(selector, data) {
-    const svgWidth = 500;
-    const svgHeight = 500;
-    const radius = Math.min(svgWidth, svgHeight) / 2;
+    const svgWidth = 800;
+    const svgHeight = 600;
+    const radius = Math.min(svgWidth, svgHeight) / 2.3;
+
+    const topPadding = 50;
+    const bottomPadding = 50;
 
     const svg = d3.select(selector)
         .append('svg')
         .attr('width', svgWidth)
         .attr('height', svgHeight)
         .append('g')
-        .attr('transform', `translate(${svgWidth / 2}, ${svgHeight / 2})`);
+        .attr('transform', `translate(${svgWidth / 2}, ${(svgHeight - topPadding - bottomPadding) / 2 + topPadding})`);
 
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -22,6 +25,10 @@ export default function pieChart(selector, data) {
         .outerRadius(radius - 10)
         .innerRadius(0);
 
+    const outerArc = d3.arc()
+        .outerRadius(radius + 20) 
+        .innerRadius(radius + 20);
+
     const arcs = svg.selectAll('.arc')
         .data(pie(data))
         .enter()
@@ -32,7 +39,6 @@ export default function pieChart(selector, data) {
         .attr('d', arc)
         .attr('fill', (d, i) => colorScale(i))
         .on("mouseover", function(event, d) {
-
             tooltip.style("opacity", 1)
                 .html(`Month: ${d.data.month}<br>Tweets: ${d.data.tweets}`)
                 .style("left", (event.pageX + 10) + "px")
@@ -48,13 +54,14 @@ export default function pieChart(selector, data) {
 
     arcs.append('text')
         .attr('transform', function(d) {
-            return 'translate(' + arc.centroid(d) + ')';
+            const pos = outerArc.centroid(d);
+            return `translate(${pos})`;
         })
         .attr('text-anchor', 'middle')
         .text(d => d.data.month)
         .style('fill', 'white')
-        .style('font-size', '12px');
-
+        .style('font-size', '12px')
+        .style('pointer-events', 'none');
 
     const tooltip = d3.select("body")
         .append("div")
