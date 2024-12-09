@@ -1,4 +1,4 @@
-import circleChart from "./circleChart.mjs";
+import pieChart from "./pieChart.mjs";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 d3.csv("./js/cleandata.csv").then(data => {
@@ -13,10 +13,8 @@ d3.csv("./js/cleandata.csv").then(data => {
     console.log(tweetCounts);
     const processedData = Array.from(tweetCounts, ([month, count]) => ({
         month,
-        tweets: count,
-        r: count * 2,
-        color: "steelblue"
+        tweets: count
     }));
 
-    circleChart("#circleChart", processedData);
+    pieChart("#pieChart", processedData);
 });
